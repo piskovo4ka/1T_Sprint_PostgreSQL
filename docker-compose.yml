@@ -1,0 +1,17 @@
+services:
+  db_de_pg:
+    container_name: db_de_pg
+    image: postgres:13
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data/
+      - ./configs/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${PG_DB_USER}
+      - POSTGRES_PASSWORD=${PG_DB_PASSWORD}
+      - POSTGRES_DB=${PG_DB_NAME}
+      - PGDATA= ${PG_DB_PGDATA}
+    restart: always
