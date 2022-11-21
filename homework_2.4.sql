@@ -1,16 +1,5 @@
 -- При инициализации Postgres была создана база данных и схема с таблицами из заданий 1-3;
 
--- добавляем названия отделов (так следовало бы сделать);
-insert into de_scala.department(title, director, amount) VALUES
-    ('Администрация', 'Иванов И.И.', 3),
-    ('Бухгалтерия', 'Сидорова С.С.', 2),
-    ('IT отдел', 'Бородко Б.Б.', 3),
-    ('PR отдел', 'Абазов А.А.', 2),
-    ('GR отдел', 'Волков В.В.', 2),
-    ('Отдел кадров', 'Глушко Г.Г.', 2),
-    ('Отдел ДЗЗ', 'Дмитров Д.Д.', 20),
-    ('АХО', 'Петров П.П.', 7);
-
 -- добавляем названия отделов (указываем id вручную, чтобы их потом корректно указать в следующих заданиях);
 insert into de_scala.department(id, title, director, amount) VALUES
     ('a1ee06c2-dc18-4090-b076-e6360dd88ff0','Администрация', 'Иванов И.И.', 3),
@@ -47,52 +36,31 @@ insert into de_scala.staff(full_name, birthdate, start_date, position, level, sa
 ('Козлов Б.Э.', '1994-05-31', '2022-10-16', 'Аналитик', 'jun', 100000, 'a3ee06c2-dc18-4090-b036-e6360dd84ff0'),
 ('Кошкин Ф.Р.', '1984-07-15', '2022-10-16', 'Аналитик', 'jun', 100000, 'a3ee06c2-dc18-4090-b036-e6360dd84ff0');
 
--- 6.1.
-select id, full_name, CURRENT_DATE-start_date as work_experience
-from de_scala.staff;
-
--- 6.2.
-select id, full_name, CURRENT_DATE-start_date as work_experience
-from de_scala.staff
-limit 3;
-
--- 6.3. уникальные номера аналитиков
-select id
-from de_scala.staff
-where position = 'Аналитик';
-
--- 6.4. сотрудники не оценивались
-
--- 6.5.
-select id
+-- 2.4.2.a.
+select full_name
 from de_scala.staff
 where salary = (select max(salary) from de_scala.staff);
 
---or
-select id
+-- 2.4.2.b.
+select full_name
 from de_scala.staff
-order by salary desc
-limit 1;
+order by full_name asc;
 
---or
-with max_amount as (select max(amount) m from de_scala.department)
-select title
-from de_scala.department
-where amount = (select m from max_amount);
-
--- 6.6*.
-select title
-from de_scala.department
-where amount = (select max(amount) from de_scala.department);
-
--- 6.7*.
-select id
-from de_scala.staff
-order by CURRENT_DATE-start_date desc;
-
--- 6.8*.
+-- 2.4.2.c.
 select level, avg(salary)
 from de_scala.staff
-group by level
+group by level;
 
--- 6.9.
+-- 2.4.2.d.
+select s.full_name, d.title
+from de_scala.staff s
+left join de_scala.department d on s.department= d.id
+order by full_name asc;
+
+-- 2.4.2.e.
+select d.title, full_name, salary
+           from de_scala.staff s
+           left join de_scala.department d on d.id = s.department
+           where (department, salary) in (select department, max(salary) m
+                                          from de_scala.staff
+                                          group by department)
